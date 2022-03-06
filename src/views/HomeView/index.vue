@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Popular from './Popular.vue'
-import Hero from './Hero.vue'
+import HomeBanner from './HomeBanner.vue'
 </script>
 
 <template>
   <main>
-    <Hero />
+    <HomeBanner />
     <Popular />
   </main>
 </template>

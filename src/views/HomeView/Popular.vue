@@ -1,25 +1,22 @@
 <script setup lang="ts">
-import BaseCard from '@/components/ui/BaseCard.vue'
-import { useApiConfigStore } from '@/stores/apiConfig';
-import { useMoviesStore } from '@/stores/movies';
-import { buildBackdropUrl } from '@/util/movieUtil';
+import { useMoviesStore } from '@/stores/movies'
+import Heading1 from '@/components/ui/Heading1.vue'
+import { orDefault } from '@/util/maybe'
+import type { Movie } from '@/model/movie'
+import MovieList from '../../components/domain/MovieList.vue'
+import { onMounted } from 'vue'
 
 const moviesStore = useMoviesStore()
-moviesStore.fetchPopular()
 
-const apiConfigStore = useApiConfigStore()
+onMounted(() => moviesStore.fetchPopular())
+
+
+const movies = (): Movie[] => orDefault<Movie[]>([])(moviesStore.popular)
 </script>
 
 <template>
-  <div class="px-20">
-    <h1 class="font-bold text-4xl my-10">Les films du moment</h1>
-    <div class="flex overflow-x-auto gap-4">
-      <BaseCard
-        v-for="movie in moviesStore.popular"
-        class="grow shrink-0"
-        :image-url="buildBackdropUrl(apiConfigStore.imageUrl, 'w780', movie)"
-        :title="movie.title"
-      />
-    </div>
+  <div class="px-20 pb-20">
+    <Heading1>Les films du moment</Heading1>
+    <MovieList :movies="movies()" />
   </div>
 </template>

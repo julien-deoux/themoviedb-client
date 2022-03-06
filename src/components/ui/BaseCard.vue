@@ -1,13 +1,21 @@
 <script setup lang="ts">
-defineProps(['imageUrl', 'title']);
+export interface CardProps {
+  imageUrl?: string
+  title?: string
+}
+
+defineProps<CardProps>()
 </script>
 
 <template>
-  <div class="w-64 inline-block">
+  <div class="max-w-3xl w-72">
     <div class="relative aspect-video">
-      <img class="object-cover rounded-xl" :src="imageUrl" />
-      <div class="absolute h-48 w-full bottom-0 opacity-80 rounded-xl bg-gradient-to-t from-black"></div>
-      <h3 class="bottom-4 inset-x-center text-center text-gray-200 font-bold text-xl">{{ title }}</h3>
+      <img v-if="imageUrl" class="object-cover rounded-xl" :src="imageUrl" />
+      <div v-else class="w-full h-full rounded-xl bg-gray"></div>
+      <div
+        class="absolute h-full w-full bottom-0 opacity-80 rounded-xl bg-gradient-to-t from-black"
+      ></div>
+      <h3 v-if="title" class="bottom-4 inset-x-center text-center font-bold text-xl">{{ title }}</h3>
     </div>
   </div>
 </template>
