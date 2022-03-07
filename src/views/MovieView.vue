@@ -3,7 +3,7 @@ import type { Movie } from '@/model/movie'
 import { useMoviesStore } from '@/stores/movies'
 import { caseOf, MaybeType, type Maybe } from '@/util/maybe'
 import { useRoute } from 'vue-router'
-import BaseBanner from '../components/ui/BaseBanner.vue'
+import BaseBanner from '@/components/ui/BaseBanner.vue'
 
 const moviesStore = useMoviesStore()
 const route = useRoute()

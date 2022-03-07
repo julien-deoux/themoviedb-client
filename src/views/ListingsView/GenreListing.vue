@@ -4,7 +4,7 @@ import type { Movie } from '@/model/movie'
 import { useMoviesStore } from '@/stores/movies'
 import type { Maybe } from '@/util/maybe'
 import { onMounted } from 'vue'
-import MovieList from '../../components/domain/MovieList.vue'
+import MovieList from '@/components/domain/MovieList.vue'
 
 interface Props {
   genre: Genre

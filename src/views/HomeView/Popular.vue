@@ -2,7 +2,7 @@
 import { useMoviesStore } from '@/stores/movies'
 import Heading1 from '@/components/ui/Heading1.vue'
 import type { Movie } from '@/model/movie'
-import MovieList from '../../components/domain/MovieList.vue'
+import MovieList from '@/components/domain/MovieList.vue'
 import { maybeMap, type Maybe } from '@/util/maybe'
 
 const moviesStore = useMoviesStore()

@@ -2,8 +2,8 @@
 import type { Movie } from '@/model/movie'
 import { caseOf, maybeMap, type Maybe } from '@/util/maybe'
 import { useRouter } from 'vue-router'
-import type { CardProps } from '../ui/BaseCard.vue'
-import BaseList from '../ui/BaseList.vue'
+import type { CardProps } from '@/components/ui/BaseCard.vue'
+import BaseList from '@/components/ui/BaseList.vue'
 
 interface Props {
   movies: Maybe<Movie[]>
