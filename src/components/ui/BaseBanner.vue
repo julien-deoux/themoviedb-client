@@ -5,7 +5,6 @@ interface Props {
   imageUrl?: string
   title: string
   subtitle?: string
-  paragraph?: string
 }
 
 defineProps<Props>()
@@ -17,7 +16,9 @@ defineProps<Props>()
     <div class="p-20 pt-36 bg-gradient-to-t from-gray-dark via-transparent">
       <Heading1>{{ title }}</Heading1>
       <h2 class="text-3xl my-5">{{ subtitle }}</h2>
-      <p v-if="!!paragraph" class="text-xl my-5 w-2/3">{{ paragraph }}</p>
+      <div class="my-5 w-2/3">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>

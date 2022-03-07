@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Movie } from '@/model/movie'
-import { useMoviesStore } from '@/stores/movies'
 import { caseOf, maybeMap, type Maybe } from '@/util/maybe'
+import { useRouter } from 'vue-router'
 import type { CardProps } from '../ui/BaseCard.vue'
 import BaseList from '../ui/BaseList.vue'
 
@@ -12,7 +12,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const moviesStore = useMoviesStore()
+const router = useRouter()
 
 const cardFromMovie = (movie: Movie): CardProps => ({
   imageUrl: movie.smallBackdropUrl,
@@ -23,7 +23,7 @@ const cardsFromMovies = (movies: Movie[]): CardProps[] => movies.map(cardFromMov
 const cards = (): Maybe<CardProps[]> => maybeMap(cardsFromMovies)(props.movies)
 const selectMovie = (index: number): void => caseOf(props.movies)({
   Nothing: () => { },
-  Just: movies => moviesStore.addFavourite(movies[index].id),
+  Just: movies => router.push('/movie/' + movies[index].id),
 })
 </script>
 

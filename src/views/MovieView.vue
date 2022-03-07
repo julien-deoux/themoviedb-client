@@ -1,33 +1,42 @@
 <script setup lang="ts">
 import type { Movie } from '@/model/movie'
 import { useMoviesStore } from '@/stores/movies'
-import { MaybeType, type Maybe } from '@/util/maybe'
+import { caseOf, MaybeType, type Maybe } from '@/util/maybe'
+import { useRoute } from 'vue-router'
 import BaseBanner from '../components/ui/BaseBanner.vue'
 
-interface Props {
-  movieId: number
-}
-
-const props = defineProps<Props>()
-
 const moviesStore = useMoviesStore()
+const route = useRoute()
 
-const movie: Maybe<Movie> = moviesStore.movieFromId(props.movieId)
+const movie: Maybe<Movie> = moviesStore.movieFromId(+route.params.id)
+
+const favourite = (): void => caseOf(movie)({
+  Nothing: () => { },
+  Just: value => moviesStore.addFavourite(value.id),
+})
+const unfavourite = (): void => caseOf(movie)({
+  Nothing: () => { },
+  Just: value => moviesStore.removeFavourite(value.id)
+})
+const isFavourite = (): boolean => caseOf(movie)({
+  Nothing: () => false,
+  Just: value => moviesStore.favouriteIds.has(value.id),
+})
 </script>
 
 <template>
   <main>
-    <BaseBanner
-      v-if="MaybeType.Nothing === movie.type"
-      title="Bienvenue"
-      paragraph="Chargement des films les plus populaires en cours"
-    />
-    <BaseBanner
-      v-else
-      :image-url="movie.value.originalBackdropUrl"
-      title="Visionnage recommandé"
-      :subtitle="movie.value.title"
-      :paragraph="movie.value.overview"
-    />
+    <BaseBanner v-if="MaybeType.Nothing === movie.type" title="Erreur">
+      <p>Il semblerait que ce film n'existe pas...</p>
+    </BaseBanner>
+    <BaseBanner v-else :image-url="movie.value.originalBackdropUrl" :title="movie.value.title">
+      <p class="mb-4">{{ movie.value.overview }}</p>
+      <button
+        v-if="!isFavourite()"
+        class="py-2 px-4 rounded-xl bg-gray-light text-gray-dark border-none"
+        @click="favourite()"
+      >Ajouter aux favoris</button>
+      <button v-else class="py-2 px-4 rounded-xl border" @click="unfavourite()">Retirer des favoris</button>
+    </BaseBanner>
   </main>
 </template>
