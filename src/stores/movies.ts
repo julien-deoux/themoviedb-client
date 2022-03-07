@@ -12,7 +12,10 @@ type MoviesStore = {
   popularIds: Maybe<number[]>,
   favouriteIds: Set<number>,
   discoverMap: {
-    [key: number]: number[]
+    [key: number]: {
+      currentPage: number,
+      movies: number[],
+    }
   },
 }
 
@@ -51,7 +54,7 @@ const moviesFromIds = (state: MoviesStore) => (movieIds: number[]): Movie[] => (
 )
 const popularMovies = (state: MoviesStore): Maybe<Movie[]> => maybeMap(moviesFromIds(state))(state.popularIds)
 const mostPopular = (state: MoviesStore): Maybe<Movie> => maybeMap(<T>(arr: T[]) => arr[0])(popularMovies(state))
-const idsFromGenre = (state: MoviesStore) => (genreId: number): Maybe<number[]> => fromNullable(state.discoverMap[genreId])
+const idsFromGenre = (state: MoviesStore) => (genreId: number): Maybe<number[]> => fromNullable(state.discoverMap[genreId]?.movies)
 const discover = (state: MoviesStore) => (genreId: number): Maybe<Movie[]> => maybeMap(moviesFromIds(state))(idsFromGenre(state)(genreId))
 const favourites = (state: MoviesStore): Maybe<Movie[]> => Just(moviesFromIds(state)(Array.from(state.favouriteIds)))
 
@@ -87,12 +90,15 @@ export const useMoviesStore = defineStore({
     },
     fetchDiscover(genreId: number) {
       const apiConfigStore = useApiConfigStore()
-      get(query('/discover/movie') + '&with_genres=' + genreId)
-        .then((data: ApiDiscoverMovie) => new Promise<ApiMovie[]>((resolve, _) => resolve(data.results)))
-        .then((movies: ApiMovie[]) => new Promise<Movie[]>((resolve, _) => resolve(movies.map(convertMovie(apiConfigStore.imageUrl)))))
-        .then(movies => {
+      const discoverGenre = this.discoverMap[genreId] || { currentPage: 0 }
+      get(query('/discover/movie') + '&with_genres=' + genreId + '&page=' + (discoverGenre.currentPage + 1))
+        .then((data: ApiDiscoverMovie) => {
+          const movies: Movie[] = data.results.map(convertMovie(apiConfigStore.imageUrl))
           insertMovies(this.movies)(movies)
-          this.discoverMap[genreId] = movies.map(movie => movie.id)
+          discoverGenre.currentPage = data.page
+          const currentMovies = discoverGenre.movies || []
+          discoverGenre.movies = [...currentMovies, ...movies.map(movie => movie.id)]
+          this.discoverMap[genreId] = discoverGenre
         }).catch(() => delete this.discoverMap[genreId])
     },
     addFavourite(movieId: number) {
