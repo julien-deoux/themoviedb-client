@@ -8,6 +8,13 @@ const moviesStore = useMoviesStore()
 
 const router = useRouter()
 
+/**
+ * Duct tape fix for linter issue
+ * 
+ * Somehow, v-on-click forgets that Typescript infers type Just<Movie> for moviesStore.mostPopular,
+ * which forces us to re-do the test in a separate function, even though we know that this
+ * function is never going to get called on Nothing.
+ */
 const openMovie = (): void => caseOf(moviesStore.mostPopular)({
   Nothing: () => { },
   Just: movie => router.push('/movie/' + movie.id),

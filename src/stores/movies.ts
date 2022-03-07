@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { Movie } from '@/model/movie'
 import { get, query } from '@/util/themoviedb'
-import { type Maybe, Nothing, Just, caseOf, fromNullable, orDefault, maybeMap } from '@/util/maybe'
+import { type Maybe, Nothing, Just, caseOf, fromNullable, maybeMap } from '@/util/maybe'
 import type { ApiPopular } from '@/model/api/movie/popular/moviePopular'
 import type { ApiMovie } from '@/model/api/movie/movie'
 import { useApiConfigStore } from './apiConfig'
@@ -11,16 +11,15 @@ type MoviesStore = {
   movies: Map<number, Movie>,
   popularIds: Maybe<number[]>,
   favouriteIds: Set<number>,
-  discoverMap: {
-    [key: number]: {
-      currentPage: number,
-      movies: number[],
-    }
-  },
+  discoverMap: Map<number, {
+    currentPage: number,
+    movies: number[],
+  }>,
 }
 
-/*
+/**
  * Utility functions
+ * * *
  */
 const backdropUrl = (backdropPath: string | null) => (imageSize: string) => (imageUrl: string): string => backdropPath ? imageUrl + imageSize + backdropPath : ''
 const safeBackdropUrl = (backdropPath: string | null) => (imageSize: string) => (maybeImageUrl: Maybe<string>): string => (
@@ -38,8 +37,9 @@ const convertMovie = (maybeImageUrl: Maybe<string>) => (movie: ApiMovie): Movie 
 })
 const insertMovies = (movieMap: Map<number, Movie>) => (movies: Movie[]): void => movies.forEach(movie => movieMap.set(movie.id, movie))
 
-/*
+/**
  * Getters
+ * * *
  */
 const movieFromId = (state: MoviesStore) => (movieId: number): Maybe<Movie> => fromNullable(state.movies.get(movieId))
 const moviesFromIds = (state: MoviesStore) => (movieIds: number[]): Movie[] => (
@@ -54,12 +54,13 @@ const moviesFromIds = (state: MoviesStore) => (movieIds: number[]): Movie[] => (
 )
 const popularMovies = (state: MoviesStore): Maybe<Movie[]> => maybeMap(moviesFromIds(state))(state.popularIds)
 const mostPopular = (state: MoviesStore): Maybe<Movie> => maybeMap(<T>(arr: T[]) => arr[0])(popularMovies(state))
-const idsFromGenre = (state: MoviesStore) => (genreId: number): Maybe<number[]> => fromNullable(state.discoverMap[genreId]?.movies)
+const idsFromGenre = (state: MoviesStore) => (genreId: number): Maybe<number[]> => fromNullable(state.discoverMap.get(genreId)?.movies)
 const discover = (state: MoviesStore) => (genreId: number): Maybe<Movie[]> => maybeMap(moviesFromIds(state))(idsFromGenre(state)(genreId))
 const favourites = (state: MoviesStore): Maybe<Movie[]> => Just(moviesFromIds(state)(Array.from(state.favouriteIds)))
 
-/*
+/**
  * Store definition
+ * * *
  */
 export const useMoviesStore = defineStore({
   id: 'movies',
@@ -67,7 +68,7 @@ export const useMoviesStore = defineStore({
     movies: new Map(),
     popularIds: Nothing(),
     favouriteIds: new Set(),
-    discoverMap: {},
+    discoverMap: new Map(),
   } as MoviesStore),
   getters: {
     movieFromId,
@@ -90,16 +91,16 @@ export const useMoviesStore = defineStore({
     },
     fetchDiscover(genreId: number) {
       const apiConfigStore = useApiConfigStore()
-      const discoverGenre = this.discoverMap[genreId] || { currentPage: 0 }
+      const discoverGenre = this.discoverMap.get(genreId) || { currentPage: 0, movies: [] }
       get(query('/discover/movie') + '&with_genres=' + genreId + '&page=' + (discoverGenre.currentPage + 1))
         .then((data: ApiDiscoverMovie) => {
           const movies: Movie[] = data.results.map(convertMovie(apiConfigStore.imageUrl))
           insertMovies(this.movies)(movies)
           discoverGenre.currentPage = data.page
-          const currentMovies = discoverGenre.movies || []
+          const currentMovies = discoverGenre.movies
           discoverGenre.movies = [...currentMovies, ...movies.map(movie => movie.id)]
-          this.discoverMap[genreId] = discoverGenre
-        }).catch(() => delete this.discoverMap[genreId])
+          this.discoverMap.set(genreId, discoverGenre)
+        }).catch(() => this.discoverMap.delete(genreId))
     },
     addFavourite(movieId: number) {
       this.favouriteIds.add(movieId)

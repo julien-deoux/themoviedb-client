@@ -16,6 +16,10 @@ defineProps<Props>()
 const genresStore = useGenresStore()
 const moviesStore = useMoviesStore()
 
+/**
+ * In the case Genres and Tabs didn't have the exact same properties,
+ * we would need to do the conversion here.
+ */
 const tabFromGenre = (genre: Genre): Tab => genre
 
 const selectGenre = (id: number): void => {

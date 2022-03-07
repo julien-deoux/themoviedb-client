@@ -10,6 +10,13 @@ const route = useRoute()
 
 const movie: Maybe<Movie> = moviesStore.movieFromId(+route.params.id)
 
+/**
+ * Duct tape fix for linter issue
+ * 
+ * Somehow, v-on-click forgets that Typescript infers type Just<Movie> for movie,
+ * which forces us to re-do the test in separate functions, even though we know that
+ * these functions are never going to get called on Nothing.
+ */
 const favourite = (): void => caseOf(movie)({
   Nothing: () => { },
   Just: value => moviesStore.addFavourite(value.id),
@@ -17,10 +24,6 @@ const favourite = (): void => caseOf(movie)({
 const unfavourite = (): void => caseOf(movie)({
   Nothing: () => { },
   Just: value => moviesStore.removeFavourite(value.id)
-})
-const isFavourite = (): boolean => caseOf(movie)({
-  Nothing: () => false,
-  Just: value => moviesStore.favouriteIds.has(value.id),
 })
 </script>
 
@@ -32,8 +35,8 @@ const isFavourite = (): boolean => caseOf(movie)({
     <BaseBanner v-else :image-url="movie.value.originalBackdropUrl" :title="movie.value.title">
       <p class="mb-4">{{ movie.value.overview }}</p>
       <button
-        v-if="!isFavourite()"
-        class="py-2 px-4 rounded-xl bg-gray-light text-gray-dark border-none"
+        v-if="!moviesStore.favouriteIds.has(movie.value.id)"
+        class="py-2 px-4 rounded-xl border border-gray-light bg-gray-light text-gray-dark"
         @click="favourite()"
       >Ajouter aux favoris</button>
       <button v-else class="py-2 px-4 rounded-xl border" @click="unfavourite()">Retirer des favoris</button>
