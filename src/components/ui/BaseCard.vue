@@ -1,11 +1,10 @@
 <script setup lang="ts">
-export interface CardProps {
+interface Props {
   imageUrl?: string
   title?: string
-  id?: number
 }
 
-defineProps<CardProps>()
+defineProps<Props>()
 defineEmits(['click'])
 </script>
 
@@ -21,6 +20,9 @@ defineEmits(['click'])
         v-if="title"
         class="absolute bottom-0 p-2 w-full text-center font-bold text-xl"
       >{{ title }}</h3>
+      <div class="absolute top-0 right-0">
+        <slot></slot>
+      </div>
     </div>
   </button>
 </template>
