@@ -10,11 +10,11 @@ onMounted(() => genresStore.fetchGenres())
 </script>
 
 <template>
-  <div class="px-20 pt-24">
+  <main class="px-20 pt-24">
     <GenreTabs :genres="genresStore.genres" :selected="genresStore.displayed" />
     <GenreListing
       v-if="MaybeType.Just === genresStore.displayedGenre.type"
       :genre="genresStore.displayedGenre.value"
     />
-  </div>
+  </main>
 </template>

@@ -2,13 +2,15 @@
 export interface CardProps {
   imageUrl?: string
   title?: string
+  id?: number
 }
 
 defineProps<CardProps>()
+defineEmits(['click'])
 </script>
 
 <template>
-  <div class="max-w-3xl w-72">
+  <button @click="$emit('click')" class="max-w-3xl w-72">
     <div class="relative aspect-video">
       <img v-if="imageUrl" class="object-cover rounded-xl" :src="imageUrl" />
       <div v-else class="w-full h-full rounded-xl bg-gray"></div>
@@ -20,5 +22,5 @@ defineProps<CardProps>()
         class="absolute bottom-0 p-2 w-full text-center font-bold text-xl"
       >{{ title }}</h3>
     </div>
-  </div>
+  </button>
 </template>

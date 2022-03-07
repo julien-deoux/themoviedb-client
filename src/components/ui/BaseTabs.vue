@@ -2,13 +2,13 @@
 import { type Maybe, equals, Just } from '@/util/maybe'
 import BaseTab from "./BaseTab.vue"
 export interface Tab {
-  id: number,
-  name: string,
+  id: number
+  name: string
 }
 
 interface Props {
-  tabs: Tab[],
-  selected: Maybe<number>,
+  tabs: Tab[]
+  selected: Maybe<number>
 }
 
 interface Emits {

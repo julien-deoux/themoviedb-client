@@ -7,8 +7,8 @@ import BaseTabs from '@/components/ui/BaseTabs.vue'
 import { useMoviesStore } from '@/stores/movies'
 
 interface Props {
-  genres: Genre[],
-  selected: Maybe<number>,
+  genres: Genre[]
+  selected: Maybe<number>
 }
 
 defineProps<Props>()

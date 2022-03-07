@@ -10,6 +10,7 @@ import type { ApiDiscoverMovie } from '@/model/api/discover/movie/discoverMovie'
 type MoviesStore = {
   movies: Map<number, Movie>,
   popularIds: Maybe<number[]>,
+  favouriteIds: Set<number>,
   discoverMap: {
     [key: number]: number[]
   },
@@ -48,10 +49,11 @@ const moviesFromIds = (state: MoviesStore) => (movieIds: number[]): Movie[] => (
       })
     ), [])
 )
-const popularMovies = (state: MoviesStore): Movie[] => orDefault([] as Movie[])(maybeMap(moviesFromIds(state))(state.popularIds))
-const mostPopular = (state: MoviesStore): Maybe<Movie> => fromNullable(popularMovies(state)[0])
-const idsFromGenre = (state: MoviesStore) => (genreId: number): number[] => orDefault([] as number[])(fromNullable(state.discoverMap[genreId]))
-const discover = (state: MoviesStore) => (genreId: number): Movie[] => moviesFromIds(state)(idsFromGenre(state)(genreId))
+const popularMovies = (state: MoviesStore): Maybe<Movie[]> => maybeMap(moviesFromIds(state))(state.popularIds)
+const mostPopular = (state: MoviesStore): Maybe<Movie> => maybeMap(<T>(arr: T[]) => arr[0])(popularMovies(state))
+const idsFromGenre = (state: MoviesStore) => (genreId: number): Maybe<number[]> => fromNullable(state.discoverMap[genreId])
+const discover = (state: MoviesStore) => (genreId: number): Maybe<Movie[]> => maybeMap(moviesFromIds(state))(idsFromGenre(state)(genreId))
+const favourites = (state: MoviesStore): Maybe<Movie[]> => Just(moviesFromIds(state)(Array.from(state.favouriteIds)))
 
 /*
  * Store definition
@@ -61,6 +63,7 @@ export const useMoviesStore = defineStore({
   state: () => ({
     movies: new Map(),
     popularIds: Nothing(),
+    favouriteIds: new Set(),
     discoverMap: {},
   } as MoviesStore),
   getters: {
@@ -69,6 +72,7 @@ export const useMoviesStore = defineStore({
     popularMovies,
     mostPopular,
     discover,
+    favourites,
   },
   actions: {
     fetchPopular() {
@@ -90,6 +94,12 @@ export const useMoviesStore = defineStore({
           insertMovies(this.movies)(movies)
           this.discoverMap[genreId] = movies.map(movie => movie.id)
         }).catch(() => delete this.discoverMap[genreId])
+    },
+    addFavourite(movieId: number) {
+      this.favouriteIds.add(movieId)
+    },
+    removeFavourite(movieId: number) {
+      this.favouriteIds.delete(movieId)
     }
   }
 })

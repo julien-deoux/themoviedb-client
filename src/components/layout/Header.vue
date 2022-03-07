@@ -7,6 +7,7 @@ import { RouterLink } from 'vue-router'
     <nav class="h-24 px-20 flex items-center">
       <RouterLink to="/" class="text-4xl">Coucou</RouterLink>
       <RouterLink to="/listings">Listes</RouterLink>
+      <RouterLink to="/favourites">Favoris</RouterLink>
     </nav>
   </header>
 </template>

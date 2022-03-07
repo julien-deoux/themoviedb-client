@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface Props {
-  selected: boolean,
-  name: string,
+  selected: boolean
+  name: string
 }
 
 defineProps<Props>()
