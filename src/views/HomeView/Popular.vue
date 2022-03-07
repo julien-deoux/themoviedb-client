@@ -7,9 +7,7 @@ import MovieList from '../../components/domain/MovieList.vue'
 import { onMounted } from 'vue'
 
 const moviesStore = useMoviesStore()
-
 onMounted(() => moviesStore.fetchPopular())
-
 
 const movies = (): Movie[] => orDefault<Movie[]>([])(moviesStore.popular)
 </script>

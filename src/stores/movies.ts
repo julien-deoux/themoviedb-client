@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { Movie } from '@/model/movie'
 import { get, query } from '@/util/themoviedb'
-import { type Maybe, Nothing, Just, caseOf } from '@/util/maybe'
+import { type Maybe, Nothing, Just, caseOf, fromNullable } from '@/util/maybe'
 import type { ApiPopular } from '@/model/api/movie/popular/moviePopular'
 import type { ApiMovie } from '@/model/api/movie/movie'
 import { useApiConfigStore } from './apiConfig'
@@ -37,13 +37,10 @@ export const useMoviesStore = defineStore({
   state: () => ({
     mostPopular: Nothing(),
     popular: Nothing(),
-    discoverMap: new Map<number, Movie[]>(),
+    discoverMap: new Map(),
   } as MoviesStore),
   getters: {
-    discover: (state: MoviesStore) => (genreId: number): Maybe<Movie[]> => {
-      const result = state.discoverMap.get(genreId)
-      return undefined === result ? Nothing() : Just(result)
-    },
+    discover: (state: MoviesStore) => (genreId: number): Maybe<Movie[]> => fromNullable(state.discoverMap.get(genreId)),
   },
   actions: {
     fetchMostPopular() {

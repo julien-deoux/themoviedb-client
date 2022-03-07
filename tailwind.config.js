@@ -1,4 +1,4 @@
-const plugin = require('tailwindcss/plugin');
+const plugin = require('tailwindcss/plugin')
 
 module.exports = {
   content: [
@@ -29,7 +29,7 @@ module.exports = {
           position: 'absolute',
           left: '50%',
           transform: 'translate(-50%, 0)'
-        }
+        },
       })
     })
   ],

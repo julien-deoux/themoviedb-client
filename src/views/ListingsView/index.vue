@@ -2,14 +2,19 @@
 import GenreListing from './GenreListing.vue'
 import { useGenresStore } from '@/stores/genres'
 import { onMounted } from 'vue'
+import GenreTabs from '@/components/domain/GenreTabs.vue'
+import { MaybeType } from '@/util/maybe'
 
 const genresStore = useGenresStore()
 onMounted(() => genresStore.fetchGenres())
-
 </script>
 
 <template>
   <div class="px-20 pt-24">
-    <GenreListing v-for="genre in genresStore.genres" :genre="genre" />
+    <GenreTabs :genres="genresStore.genres" :selected="genresStore.displayed" />
+    <GenreListing
+      v-if="MaybeType.Just === genresStore.displayedGenre.type"
+      :genre="genresStore.displayedGenre.value"
+    />
   </div>
 </template>
