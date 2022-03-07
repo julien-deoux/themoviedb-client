@@ -1,5 +1,3 @@
-const plugin = require('tailwindcss/plugin')
-
 module.exports = {
   content: [
     "./index.html",
@@ -22,15 +20,4 @@ module.exports = {
       }
     },
   },
-  plugins: [
-    plugin(function ({ addUtilities }) {
-      addUtilities({
-        '.inset-x-center': {
-          position: 'absolute',
-          left: '50%',
-          transform: 'translate(-50%, 0)'
-        },
-      })
-    })
-  ],
 }

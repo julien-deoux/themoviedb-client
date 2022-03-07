@@ -15,7 +15,10 @@ defineProps<CardProps>()
       <div
         class="absolute h-full w-full bottom-0 opacity-80 rounded-xl bg-gradient-to-t from-black"
       ></div>
-      <h3 v-if="title" class="bottom-4 inset-x-center text-center font-bold text-xl">{{ title }}</h3>
+      <h3
+        v-if="title"
+        class="absolute bottom-0 p-2 w-full text-center font-bold text-xl"
+      >{{ title }}</h3>
     </div>
   </div>
 </template>
