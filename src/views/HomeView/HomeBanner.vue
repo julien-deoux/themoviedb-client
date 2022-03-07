@@ -2,10 +2,8 @@
 import { useMoviesStore } from '@/stores/movies'
 import { MaybeType } from '@/util/maybe'
 import BaseBanner from '@/components/ui/BaseBanner.vue'
-import { onMounted } from 'vue'
 
 const moviesStore = useMoviesStore()
-onMounted(() => moviesStore.fetchMostPopular())
 </script>
 
 <template>
