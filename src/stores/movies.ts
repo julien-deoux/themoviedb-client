@@ -10,7 +10,9 @@ import type { ApiDiscoverMovie } from '@/model/api/discover/movie/discoverMovie'
 type MoviesStore = {
   movies: Map<number, Movie>,
   popularIds: Maybe<number[]>,
-  discoverMap: Map<number, number[]>,
+  discoverMap: {
+    [key: number]: number[]
+  },
 }
 
 /*
@@ -48,7 +50,7 @@ const moviesFromIds = (state: MoviesStore) => (movieIds: number[]): Movie[] => (
 )
 const popularMovies = (state: MoviesStore): Movie[] => orDefault([] as Movie[])(maybeMap(moviesFromIds(state))(state.popularIds))
 const mostPopular = (state: MoviesStore): Maybe<Movie> => fromNullable(popularMovies(state)[0])
-const idsFromGenre = (state: MoviesStore) => (genreId: number): number[] => orDefault([] as number[])(fromNullable(state.discoverMap.get(genreId)))
+const idsFromGenre = (state: MoviesStore) => (genreId: number): number[] => orDefault([] as number[])(fromNullable(state.discoverMap[genreId]))
 const discover = (state: MoviesStore) => (genreId: number): Movie[] => moviesFromIds(state)(idsFromGenre(state)(genreId))
 
 /*
@@ -59,7 +61,7 @@ export const useMoviesStore = defineStore({
   state: () => ({
     movies: new Map(),
     popularIds: Nothing(),
-    discoverMap: new Map(),
+    discoverMap: {},
   } as MoviesStore),
   getters: {
     movieFromId,
@@ -86,8 +88,8 @@ export const useMoviesStore = defineStore({
         .then((movies: ApiMovie[]) => new Promise<Movie[]>((resolve, _) => resolve(movies.map(convertMovie(apiConfigStore.imageUrl)))))
         .then(movies => {
           insertMovies(this.movies)(movies)
-          this.discoverMap.set(genreId, movies.map(movie => movie.id))
-        }).catch(() => this.discoverMap.delete(genreId))
+          this.discoverMap[genreId] = movies.map(movie => movie.id)
+        }).catch(() => delete this.discoverMap[genreId])
     }
   }
 })
