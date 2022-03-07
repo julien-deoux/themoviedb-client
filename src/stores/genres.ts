@@ -10,8 +10,6 @@ type GenreStore = {
   displayed: Maybe<number>,
 }
 
-const genreResource = '/genre/movie/list'
-
 const convertGenre = (genre: ApiGenre): Genre => genre
 
 const genreFromId = (genres: Genre[]) => (genreId: number): Maybe<Genre> => fromNullable(genres.find(genre => genreId === genre.id))
@@ -27,7 +25,7 @@ export const useGenresStore = defineStore({
   },
   actions: {
     fetchGenres() {
-      get(query(genreResource))
+      get(query('/genre/movie/list'))
         .then((data: ApiGenreMovieList) => new Promise<ApiGenre[]>((resolve, _) => resolve(data.genres)))
         .then((genres: ApiGenre[]) => new Promise<Genre[]>((resolve, _) => resolve(genres.map(convertGenre))))
         .then(genres => this.genres = genres).catch(() => this.genres = [])

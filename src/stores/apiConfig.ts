@@ -7,8 +7,6 @@ type ApiConfigStore = {
   imageUrl: Maybe<string>,
 }
 
-const configurationResource = '/configuration'
-
 export const useApiConfigStore = defineStore({
   id: 'config',
   state: () => ({
@@ -16,7 +14,7 @@ export const useApiConfigStore = defineStore({
   } as ApiConfigStore),
   actions: {
     fetchSecureBaseUrl() {
-      get(query(configurationResource))
+      get(query('/configuration'))
         .then((data: ApiConfiguration) => new Promise<string>((resolve, _) => resolve(data.images.secure_base_url)))
         .then(url => this.imageUrl = Just(url)).catch(() => this.imageUrl = Nothing())
     }

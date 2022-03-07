@@ -13,9 +13,6 @@ type MoviesStore = {
   discoverMap: Map<number, number[]>,
 }
 
-const popularResource = '/movie/popular'
-const discoverResource = '/discover/movie'
-
 /*
  * Utility functions
  */
@@ -74,7 +71,7 @@ export const useMoviesStore = defineStore({
   actions: {
     fetchPopular() {
       const apiConfigStore = useApiConfigStore()
-      get(query(popularResource))
+      get(query('/movie/popular'))
         .then((data: ApiPopular) => new Promise<ApiMovie[]>((resolve, _) => resolve(data.results.slice(0, 5))))
         .then((movies: ApiMovie[]) => new Promise<Movie[]>((resolve, _) => resolve(movies.map(convertMovie(apiConfigStore.imageUrl)))))
         .then(movies => {
@@ -84,7 +81,7 @@ export const useMoviesStore = defineStore({
     },
     fetchDiscover(genreId: number) {
       const apiConfigStore = useApiConfigStore()
-      get(query(discoverResource) + '&with_genres=' + genreId)
+      get(query('/discover/movie') + '&with_genres=' + genreId)
         .then((data: ApiDiscoverMovie) => new Promise<ApiMovie[]>((resolve, _) => resolve(data.results)))
         .then((movies: ApiMovie[]) => new Promise<Movie[]>((resolve, _) => resolve(movies.map(convertMovie(apiConfigStore.imageUrl)))))
         .then(movies => {
